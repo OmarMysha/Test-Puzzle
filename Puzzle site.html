@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daily Birthday Puzzle</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #fcefee, #f8f2f9);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="max-w-xl w-full bg-white rounded-3xl shadow-xl p-8 text-center">
+    <h1 class="text-5xl font-extrabold mb-6 text-pink-500">Daily Birthday Puzzle</h1>
+    <p id="puzzle-text" class="text-lg mb-4">Loading today's puzzle...</p>
+    <input
+      id="puzzle-answer"
+      type="text"
+      placeholder="Type your answer here"
+      class="border border-gray-300 rounded-lg px-4 py-2 w-full mb-4"
+      autocomplete="off"
+    />
+    <button
+      id="submit-answer"
+      class="bg-pink-400 hover:bg-pink-500 text-white font-semibold px-6 py-2 rounded-lg w-full"
+    >
+      Submit
+    </button>
+    <p id="feedback" class="mt-4 font-medium text-center"></p>
+    <p id="next-clue" class="mt-6 italic text-pink-600"></p>
+    <a href="index.html" class="inline-block mt-12 text-pink-500 hover:underline font-semibold">
+      ← Back to Birthday Gift Site
+    </a>
+  </main>
+
+  <script>
+    const puzzles = [
+      {
+        question: "I speak without a mouth and hear without ears. I have nobody, but I come alive with wind. What am I?",
+        answer: "echo",
+        clue: "You got it! Here's a hint: Our love echoes through time."
+      },
+      {
+        question: "I’m tall when I’m young, and I’m short when I’m old. What am I?",
+        answer: "candle",
+        clue: "Well done! Like a candle, our moments burn bright."
+      },
+      {
+        question: "What has keys but can't open locks?",
+        answer: "piano",
+        clue: "Yes! Music always plays in our hearts."
+      },
+      // Add more puzzles here...
+    ];
+
+    function getCurrentPuzzleIndex() {
+      const startDate = new Date("2025-08-01"); // Change this to your puzzle start date
+      const now = new Date();
+      const diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+      return diffDays >= 0 && diffDays < puzzles.length ? diffDays : puzzles.length - 1;
+    }
+
+    const puzzleIndex = getCurrentPuzzleIndex();
+    const puzzle = puzzles[puzzleIndex];
+
+    const puzzleText = document.getElementById("puzzle-text");
+    const answerInput = document.getElementById("puzzle-answer");
+    const submitBtn = document.getElementById("submit-answer");
+    const feedback = document.getElementById("feedback");
+    const nextClue = document.getElementById("next-clue");
+
+    const progressKey = "birthdayPuzzleProgress";
+    let solvedPuzzles = JSON.parse(localStorage.getItem(progressKey)) || [];
+
+    function loadPuzzle() {
+      if (solvedPuzzles.includes(puzzleIndex)) {
+        puzzleText.textContent = `Puzzle solved! Today's clue:`;
+        answerInput.style.display = "none";
+        submitBtn.style.display = "none";
+        feedback.textContent = "";
+        nextClue.textContent = puzzle.clue;
+      } else {
+        puzzleText.textContent = puzzle.question;
+        answerInput.style.display = "block";
+        submitBtn.style.display = "inline-block";
+        feedback.textContent = "";
+        nextClue.textContent = "";
+      }
+    }
+
+    submitBtn.addEventListener("click", () => {
+      const userAnswer = answerInput.value.trim().toLowerCase();
+      if (userAnswer === puzzle.answer.toLowerCase()) {
+        feedback.textContent = "Correct! 🎉";
+        nextClue.textContent = puzzle.clue;
+
+        if (!solvedPuzzles.includes(puzzleIndex)) {
+          solvedPuzzles.push(puzzleIndex);
+          localStorage.setItem(progressKey, JSON.stringify(solvedPuzzles));
+        }
+
+        answerInput.style.display = "none";
+        submitBtn.style.display = "none";
+      } else {
+        feedback.textContent = "Try again! Hint: Think carefully.";
+        nextClue.textContent = "";
+      }
+    });
+
+    loadPuzzle();
+  </script>
+
+</body>
+</html>
